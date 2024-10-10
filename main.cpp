@@ -115,11 +115,11 @@ public:
       finalResult += operationSet.leftOperand - operationSet.rightOperand;
       break;
     case '*':
-      finalResult *= operationSet.leftOperand * operationSet.rightOperand;
+      finalResult = operationSet.leftOperand * operationSet.rightOperand;
       break;
     case '/':
       if (operationSet.rightOperand != 0) {
-        finalResult /= operationSet.leftOperand / operationSet.rightOperand;
+        finalResult = operationSet.leftOperand / operationSet.rightOperand;
       } else {
         std::cerr << "Error: Division by zero\n";
         return 0;
@@ -129,7 +129,6 @@ public:
       std::cerr << "Unsupported operation: " << operationSet.operation << "\n";
       return 0;
     }
-
     return finalResult;
   }
 
