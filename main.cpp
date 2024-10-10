@@ -39,7 +39,7 @@ void onClearClicked(GtkButton *button, gpointer userData) {
   gtk_entry_set_text(GTK_ENTRY(display), "");
 }
 
-int getOperationResult(OperationSet *operationSet) {
+int getOperationResult(const OperationSet *operationSet) {
   int result;
   switch (operationSet->operation) {
   case '+':
@@ -71,66 +71,54 @@ void onEqualClicked(GtkButton *button, gpointer userData) {
   const char *currentText = gtk_entry_get_text(GTK_ENTRY(display));
   printf("Current text: %s\n", currentText);
 
-  int result = 0;
   std::vector<OperationSet> operationSets;
 
-  int operandIndex = 0;
-  char leftOperand[8] = {'\0'};
-  char rightOperand[8] = {'\0'};
+  // Temporary variables to hold current operands and operation
+  int leftOperand = 0;
+  int rightOperand = 0;
   char operationType = '\0';
-  int rightOperatorsCounter = 0;
 
+  // Iterate through currentText to parse operands and operators
   for (int i = 0; i < strlen(currentText); i++) {
-
-    if (operandIndex >= 7) {
-      operandIndex = 0;
-    }
-    if (leftOperand[0] != '\0' && operationType != '\0' &&
-        rightOperatorsCounter >= 1) {
-      if (rightOperand[0] == '\0') {
-        rightOperand[0] = 0;
+    if (isdigit(currentText[i])) {
+      // Construct the left operand if we haven't yet
+      if (operationType == '\0') {
+        leftOperand = leftOperand * 10 + (currentText[i] - '0');
+      } else {
+        // Construct the right operand after the operator
+        rightOperand = rightOperand * 10 + (currentText[i] - '0');
       }
-      int leftValue = std::atoi(leftOperand);
-      int rightValue = std::atoi(rightOperand);
-      operationSets.push_back({operationType, leftValue, rightValue});
-      printf("Left OPERAND %d", leftValue);
-      printf("Right OPERAND %d", rightValue);
+    } else {
+      // When we encounter an operator, save the operation and reset
+      // rightOperand
+      if (operationType != '\0') {
+        // Store the current operation in the set
+        operationSets.push_back({operationType, leftOperand, rightOperand});
+        printf("Left OPERAND %d, Right OPERAND %d, Operation %c\n", leftOperand,
+               rightOperand, operationType);
 
-      memset(leftOperand, '\0', sizeof(leftOperand));
-      memset(rightOperand, '\0', sizeof(rightOperand));
-      operationType = '\0';
-      continue;
-    }
-    if (isdigit(currentText[i]) && operandIndex <= 7 && operationType == '\0') {
-      leftOperand[operandIndex] = currentText[i];
-      operandIndex++;
-      continue;
-    }
-    if (isdigit(currentText[i]) && operandIndex <= 7 &&
-        leftOperand[0] != '\0' && operationType != '\0') {
-      rightOperand[operandIndex] = currentText[i];
-      operandIndex++;
-      rightOperatorsCounter++;
-      continue;
-    }
-    if (!isdigit(currentText[i])) {
-      operationType = currentText[i];
-      continue;
+        // Reset for next operation
+        leftOperand = 0;
+        rightOperand = 0;
+      }
+      operationType = currentText[i]; // Update operation
     }
   }
 
-  std::vector<int> operationSetResults;
+  // Push the last operation after the loop
+  if (operationType != '\0') {
+    operationSets.push_back({operationType, leftOperand, rightOperand});
+    printf("Left OPERAND %d, Right OPERAND %d, Operation %c\n", leftOperand,
+           rightOperand, operationType);
+  }
+
+  // Calculate results of the operations
   int finalResult = 0;
-  for (size_t i = 0; i < operationSets.size(); ++i) {
-    operationSetResults.push_back(getOperationResult(&operationSets[i]));
+  for (const auto &opSet : operationSets) {
+    finalResult = getOperationResult(&opSet); // Call to the updated function
   }
 
-  for (size_t i = 0; i < operationSetResults.size(); ++i) {
-    if (i > 0) {
-      finalResult += operationSetResults[i];
-    }
-  }
-
+  // Update the display with the final result
   char resultText[256];
   snprintf(resultText, sizeof(resultText), "%d", finalResult);
   gtk_entry_set_text(GTK_ENTRY(display), resultText);
