@@ -1,7 +1,9 @@
 #include <gtk/gtk.h>
 
-// Global variable for the display entry
+// Global variables for the display entry, window, and grid
 GtkWidget *display;
+GtkWidget *window;
+GtkWidget *grid;
 
 void on_number_clicked(GtkButton *button, gpointer user_data)
 {
@@ -25,6 +27,7 @@ void on_equal_clicked(GtkButton *button, gpointer user_data)
   const char *data = (const char *)user_data;
 
   printf("User data: %s\n", data);
+
   int result = 0;
   sscanf(current_text, "%d", &result);
 
@@ -33,15 +36,15 @@ void on_equal_clicked(GtkButton *button, gpointer user_data)
   gtk_entry_set_text(GTK_ENTRY(display), result_text);
 }
 
-int main(int argc, char *argv[])
+void setup_window(int *argc, char ***argv)
 {
   // Initialize GTK
-  gtk_init(&argc, &argv);
+  gtk_init(argc, argv);
 
   // Create main window
-  GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+  window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
   gtk_window_set_title(GTK_WINDOW(window), "Simple Calculator");
-  gtk_window_set_default_size(GTK_WINDOW(window), 600, 600);
+  gtk_window_set_default_size(GTK_WINDOW(window), 200, 300);
 
   // Create a vertical box layout
   GtkWidget *vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 2);
@@ -52,8 +55,14 @@ int main(int argc, char *argv[])
   gtk_box_pack_start(GTK_BOX(vbox), display, FALSE, FALSE, 2);
 
   // Create grid for buttons
-  GtkWidget *grid = gtk_grid_new();
+  grid = gtk_grid_new();
   gtk_box_pack_start(GTK_BOX(vbox), grid, TRUE, TRUE, 2);
+}
+
+int main(int argc, char *argv[])
+{
+  // Set up the window and UI elements
+  setup_window(&argc, &argv);
 
   // Create buttons for digits and operations
   const char *buttons[4][4] = {
@@ -77,7 +86,7 @@ int main(int argc, char *argv[])
         }
         else if (g_strcmp0(buttons[i][j], "=") == 0)
         {
-          g_signal_connect(button, "clicked", G_CALLBACK(on_equal_clicked), NULL);
+          g_signal_connect(button, "clicked", G_CALLBACK(on_equal_clicked), (gpointer) "Equal button pressed");
         }
         else
         {
