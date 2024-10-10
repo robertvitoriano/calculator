@@ -135,12 +135,13 @@ void setupWindow(int *argc, char ***argv) {
 int main(int argc, char *argv[]) {
   setupWindow(&argc, &argv);
 
-  const char *buttons[4][4] = {{"7", "8", "9", "C"},
-                               {"4", "5", "6", "+"},
-                               {"1", "2", "3", "-"},
-                               {"0", "=", NULL, NULL}};
+  const char *buttons[5][4] = {{"7", "8", "9", "C"},
+                               {"4", "5", "6", "1"},
+                               {"2", "3", "4", "0"},
+                               {"+", "-", "*", "/"},
+                               {NULL, NULL, "0", "="}};
 
-  for (int i = 0; i < 4; ++i) {
+  for (int i = 0; i < 5; ++i) {
     for (int j = 0; j < 4; ++j) {
       if (buttons[i][j] != NULL) {
         GtkWidget *button = gtk_button_new_with_label(buttons[i][j]);
@@ -149,8 +150,7 @@ int main(int argc, char *argv[]) {
         if (g_strcmp0(buttons[i][j], "C") == 0) {
           g_signal_connect(button, "clicked", G_CALLBACK(onClearClicked), NULL);
         } else if (g_strcmp0(buttons[i][j], "=") == 0) {
-          g_signal_connect(button, "clicked", G_CALLBACK(onEqualClicked),
-                           (gpointer) "Equal button pressed");
+          g_signal_connect(button, "clicked", G_CALLBACK(onEqualClicked), NULL);
         } else if (isdigit(buttons[i][j][0])) {
           g_signal_connect(button, "clicked", G_CALLBACK(onNumberClicked),
                            NULL);
