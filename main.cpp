@@ -6,61 +6,60 @@ GtkWidget *window;
 GtkWidget *grid;
 char operation;
 
-void append_character_to_display(GtkButton *button) {
-  const char *current_text = gtk_entry_get_text(GTK_ENTRY(display));
-  const char *button_text = gtk_button_get_label(button);
+void appendCharacterToDisplay(GtkButton *button) {
+  const char *currentText = gtk_entry_get_text(GTK_ENTRY(display));
+  const char *buttonText = gtk_button_get_label(button);
 
-  char new_text[256];
-  snprintf(new_text, sizeof(new_text), "%s%s", current_text, button_text);
+  char newText[256];
+  snprintf(newText, sizeof(newText), "%s%s", currentText, buttonText);
 
-  gtk_entry_set_text(GTK_ENTRY(display), new_text);
+  gtk_entry_set_text(GTK_ENTRY(display), newText);
 }
 
-void on_number_clicked(GtkButton *button, gpointer user_data) {
-  append_character_to_display(button);
+void onNumberClicked(GtkButton *button, gpointer userData) {
+  appendCharacterToDisplay(button);
 }
 
-void on_operation_clicked(GtkButton *button, gpointer user_data) {
-  append_character_to_display(button);
+void onOperationClicked(GtkButton *button, gpointer userData) {
+  appendCharacterToDisplay(button);
 
-  const char *data = (const char *)user_data;
-  operation = data[0]; // Correctly assign the operation character
+  const char *data = (const char *)userData;
+  operation = data[0];
 }
 
-void on_clear_clicked(GtkButton *button, gpointer user_data) {
+void onClearClicked(GtkButton *button, gpointer userData) {
   gtk_entry_set_text(GTK_ENTRY(display), "");
 }
 
-void on_equal_clicked(GtkButton *button, gpointer user_data) {
-  const char *current_text = gtk_entry_get_text(GTK_ENTRY(display));
-  printf("Current text: %s\n", current_text);
+void onEqualClicked(GtkButton *button, gpointer userData) {
+  const char *currentText = gtk_entry_get_text(GTK_ENTRY(display));
+  printf("Current text: %s\n", currentText);
 
-  int left_operand = 0, right_operand = 0;
-  char operation_type;
+  int leftOperand = 0, rightOperand = 0;
+  char operationType;
 
-  sscanf(current_text, "%d%c%d", &left_operand, &operation_type,
-         &right_operand);
+  sscanf(currentText, "%d%c%d", &leftOperand, &operationType, &rightOperand);
 
   int result = 0;
 
-  switch (operation_type) {
+  switch (operationType) {
   case '+':
-    result = left_operand + right_operand;
+    result = leftOperand + rightOperand;
     break;
   case '-':
-    result = left_operand - right_operand;
+    result = leftOperand - rightOperand;
     break;
   default:
-    printf("Unsupported operation: %c\n", operation_type);
+    printf("Unsupported operation: %c\n", operationType);
     return;
   }
 
-  char result_text[256];
-  snprintf(result_text, sizeof(result_text), "%d", result);
-  gtk_entry_set_text(GTK_ENTRY(display), result_text);
+  char resultText[256];
+  snprintf(resultText, sizeof(resultText), "%d", result);
+  gtk_entry_set_text(GTK_ENTRY(display), resultText);
 }
 
-void setup_window(int *argc, char ***argv) {
+void setupWindow(int *argc, char ***argv) {
   gtk_init(argc, argv);
 
   window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -78,7 +77,7 @@ void setup_window(int *argc, char ***argv) {
 }
 
 int main(int argc, char *argv[]) {
-  setup_window(&argc, &argv);
+  setupWindow(&argc, &argv);
 
   const char *buttons[4][4] = {{"7", "8", "9", "C"},
                                {"4", "5", "6", "+"},
@@ -92,20 +91,15 @@ int main(int argc, char *argv[]) {
         gtk_grid_attach(GTK_GRID(grid), button, j, i, 1, 1);
 
         if (g_strcmp0(buttons[i][j], "C") == 0) {
-
-          g_signal_connect(button, "clicked", G_CALLBACK(on_clear_clicked),
-                           NULL);
+          g_signal_connect(button, "clicked", G_CALLBACK(onClearClicked), NULL);
         } else if (g_strcmp0(buttons[i][j], "=") == 0) {
-
-          g_signal_connect(button, "clicked", G_CALLBACK(on_equal_clicked),
+          g_signal_connect(button, "clicked", G_CALLBACK(onEqualClicked),
                            (gpointer) "Equal button pressed");
         } else if (isdigit(buttons[i][j][0])) {
-
-          g_signal_connect(button, "clicked", G_CALLBACK(on_number_clicked),
+          g_signal_connect(button, "clicked", G_CALLBACK(onNumberClicked),
                            NULL);
         } else {
-
-          g_signal_connect(button, "clicked", G_CALLBACK(on_operation_clicked),
+          g_signal_connect(button, "clicked", G_CALLBACK(onOperationClicked),
                            (gpointer)buttons[i][j]);
         }
       }
