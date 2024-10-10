@@ -47,7 +47,7 @@ int getOperationResult(const OperationSet *operationSet) {
     finalResult += operationSet->leftOperand + operationSet->rightOperand;
     break;
   case '-':
-    finalResult -= operationSet->leftOperand - operationSet->rightOperand;
+    finalResult += operationSet->leftOperand - operationSet->rightOperand;
     break;
   case '*':
     finalResult *= operationSet->leftOperand * operationSet->rightOperand;
@@ -135,11 +135,10 @@ void setupWindow(int *argc, char ***argv) {
 int main(int argc, char *argv[]) {
   setupWindow(&argc, &argv);
 
-  const char *buttons[5][4] = {{"7", "8", "9", "C"},
-                               {"4", "5", "6", "1"},
-                               {"2", "3", "4", "0"},
-                               {"+", "-", "*", "/"},
-                               {NULL, NULL, "0", "="}};
+  const char *buttons[5][4] = {{"+", "-", "*", "C"},
+                               {"7", "8", "9", "/"},
+                               {"4", "5", "6", "="},
+                               {"1", "2", "3", "0"}};
 
   for (int i = 0; i < 5; ++i) {
     for (int j = 0; j < 4; ++j) {
