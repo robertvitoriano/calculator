@@ -2,11 +2,13 @@
 #include <cstring>
 #include <ctype.h>
 #include <gtk/gtk.h>
-#include <vector> // Added include for vector
+#include <vector>
 
 GtkWidget *display;
 GtkWidget *window;
 GtkWidget *grid;
+int finalResult = 0;
+
 char operation;
 
 struct OperationSet {
@@ -40,20 +42,19 @@ void onClearClicked(GtkButton *button, gpointer userData) {
 }
 
 int getOperationResult(const OperationSet *operationSet) {
-  int result;
   switch (operationSet->operation) {
   case '+':
-    result = operationSet->leftOperand + operationSet->rightOperand;
+    finalResult += operationSet->leftOperand + operationSet->rightOperand;
     break;
   case '-':
-    result = operationSet->leftOperand - operationSet->rightOperand;
+    finalResult -= operationSet->leftOperand - operationSet->rightOperand;
     break;
   case '*':
-    result = operationSet->leftOperand * operationSet->rightOperand;
+    finalResult *= operationSet->leftOperand * operationSet->rightOperand;
     break;
   case '/':
     if (operationSet->rightOperand != 0) {
-      result = operationSet->leftOperand / operationSet->rightOperand;
+      finalResult /= operationSet->leftOperand / operationSet->rightOperand;
     } else {
       printf("Error: Division by zero\n");
       return 0;
@@ -64,7 +65,7 @@ int getOperationResult(const OperationSet *operationSet) {
     return 0;
   }
 
-  return result;
+  return finalResult;
 }
 
 void onEqualClicked(GtkButton *button, gpointer userData) {
@@ -79,10 +80,11 @@ void onEqualClicked(GtkButton *button, gpointer userData) {
 
   for (int i = 0; i < strlen(currentText); i++) {
     if (isdigit(currentText[i])) {
+      int convertedDigit = (currentText[i] - '0');
       if (operationType == '\0') {
-        leftOperand = leftOperand * 10 + (currentText[i] - '0');
+        leftOperand = leftOperand * 10 + convertedDigit;
       } else {
-        rightOperand = rightOperand * 10 + (currentText[i] - '0');
+        rightOperand = rightOperand * 10 + convertedDigit;
       }
     } else {
 
@@ -102,11 +104,10 @@ void onEqualClicked(GtkButton *button, gpointer userData) {
     operationSets.push_back({operationType, leftOperand, rightOperand});
   }
 
-  int finalResult = 0;
+  finalResult = 0;
   for (const auto &opSet : operationSets) {
     finalResult = getOperationResult(&opSet);
-    printf("Left OPERAND %d, Right OPERAND %d, Operation %c\n",
-           opSet.leftOperand, opSet.rightOperand, opSet.operation);
+    printf("\nFinal result %i\n", finalResult);
   }
 
   char resultText[256];
