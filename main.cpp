@@ -100,13 +100,13 @@ void onEqualClicked(GtkButton *button, gpointer userData) {
 
   if (operationType != '\0') {
     operationSets.push_back({operationType, leftOperand, rightOperand});
-    printf("Left OPERAND %d, Right OPERAND %d, Operation %c\n", leftOperand,
-           rightOperand, operationType);
   }
 
   int finalResult = 0;
   for (const auto &opSet : operationSets) {
     finalResult = getOperationResult(&opSet);
+    printf("Left OPERAND %d, Right OPERAND %d, Operation %c\n",
+           opSet.leftOperand, opSet.rightOperand, opSet.operation);
   }
 
   char resultText[256];
