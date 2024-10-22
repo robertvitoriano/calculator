@@ -67,8 +67,8 @@ public:
 
   void onClearClicked() { gtk_entry_set_text(GTK_ENTRY(display), ""); }
 
-  void onEqualClicked() {
-    const char *currentText = gtk_entry_get_text(GTK_ENTRY(display));
+  std::vector<OperationSet> getOperationSets(const char *currentText) {
+
     std::vector<OperationSet> operationSets;
 
     int leftOperand = 0;
@@ -95,12 +95,18 @@ public:
     if (operationType != '\0') {
       operationSets.push_back({operationType, leftOperand, rightOperand});
     }
+    return operationSets;
+  }
+  void onEqualClicked() {
+    const char *currentText = gtk_entry_get_text(GTK_ENTRY(display));
 
     finalResult = 0;
+
+    std::vector<OperationSet> operationSets = getOperationSets(currentText);
+
     for (const auto &opSet : operationSets) {
       finalResult = getOperationResult(opSet);
     }
-
     char resultText[256];
     snprintf(resultText, sizeof(resultText), "%d", finalResult);
     gtk_entry_set_text(GTK_ENTRY(display), resultText);
@@ -115,6 +121,19 @@ public:
       finalResult += operationSet.leftOperand - operationSet.rightOperand;
       break;
     case '*':
+
+      if (operationSet.rightOperand == 0 && operationSet.leftOperand == 0) {
+        finalResult *= 1;
+        break;
+      }
+      if (operationSet.leftOperand == 0) {
+        finalResult *= operationSet.rightOperand;
+        break;
+      }
+      if (operationSet.rightOperand == 0) {
+        finalResult *= operationSet.leftOperand;
+        break;
+      }
       finalResult = operationSet.leftOperand * operationSet.rightOperand;
       break;
     case '/':
